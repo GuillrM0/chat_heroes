@@ -1,15 +1,24 @@
-
 var url = window.location.href;
-var swLocation = '/chat_heroes/sw.js';
+var swLocation = '/chat_heroes/sw.js'; // Ruta por defecto del Service Worker
 
-if(navigator.serviceWorker){
-    if (url.includes('localhost')){
-        swLocation = '/sw.js'
+// Verifica si el navegador soporta Service Workers
+if (navigator.serviceWorker) {
+    if (url.includes('localhost')) {
+        // Si está en localhost, usa una ruta diferente para el Service Worker
+        swLocation = '/sw.js';
     }
-    navigator.serviceWorker.register('swLocation')
-}
-// Referencias de jQuery
 
+    // Registra el Service Worker utilizando la variable swLocation
+    navigator.serviceWorker.register(swLocation)
+        .then(reg => {
+            console.log('Service Worker registrado correctamente', reg);
+        })
+        .catch(err => {
+            console.warn('Error al registrar el Service Worker', err);
+        });
+}
+
+// Referencias de jQuery
 var titulo      = $('#titulo');
 var nuevoBtn    = $('#nuevo-btn');
 var salirBtn    = $('#salir-btn');
@@ -17,7 +26,6 @@ var cancelarBtn = $('#cancel-btn');
 var postBtn     = $('#post-btn');
 var avatarSel   = $('#seleccion');
 var timeline    = $('#timeline');
-
 var modal       = $('#modal');
 var modalAvatar = $('#modal-avatar');
 var avatarBtns  = $('.seleccion-avatar');
@@ -26,13 +34,9 @@ var txtMensaje  = $('#txtMensaje');
 // El usuario, contiene el ID del héroe seleccionado
 var usuario;
 
-
-
-
 // ===== Codigo de la aplicación
 
 function crearMensajeHTML(mensaje, personaje) {
-
     var content =`
     <li class="animated fadeIn fast">
         <div class="avatar">
@@ -44,23 +48,17 @@ function crearMensajeHTML(mensaje, personaje) {
                 <br/>
                 ${ mensaje }
             </div>
-            
             <div class="arrow"></div>
         </div>
     </li>
     `;
-
     timeline.prepend(content);
     cancelarBtn.click();
-
 }
 
-
-
 // Globals
-function logIn( ingreso ) {
-
-    if ( ingreso ) {
+function logIn(ingreso) {
+    if (ingreso) {
         nuevoBtn.removeClass('oculto');
         salirBtn.removeClass('oculto');
         timeline.removeClass('oculto');
@@ -71,63 +69,48 @@ function logIn( ingreso ) {
         salirBtn.addClass('oculto');
         timeline.addClass('oculto');
         avatarSel.removeClass('oculto');
-
         titulo.text('Seleccione Personaje');
-    
     }
-
 }
 
-
-// Seleccion de personaje
+// Selección de personaje
 avatarBtns.on('click', function() {
-
     usuario = $(this).data('user');
-
     titulo.text('@' + usuario);
-
     logIn(true);
-
 });
 
-// Boton de salir
+// Botón de salir
 salirBtn.on('click', function() {
-
     logIn(false);
-
 });
 
-// Boton de nuevo mensaje
+// Botón de nuevo mensaje
 nuevoBtn.on('click', function() {
-
     modal.removeClass('oculto');
     modal.animate({ 
         marginTop: '-=1000px',
         opacity: 1
-    }, 200 );
-
+    }, 200);
 });
 
-// Boton de cancelar mensaje
+// Botón de cancelar mensaje
 cancelarBtn.on('click', function() {
-   modal.animate({ 
-       marginTop: '+=1000px',
-       opacity: 0
+    modal.animate({ 
+        marginTop: '+=1000px',
+        opacity: 0
     }, 200, function() {
         modal.addClass('oculto');
         txtMensaje.val('');
     });
 });
 
-// Boton de enviar mensaje
+// Botón de enviar mensaje
 postBtn.on('click', function() {
-
     var mensaje = txtMensaje.val();
-    if ( mensaje.length === 0 ) {
+    if (mensaje.length === 0) {
         cancelarBtn.click();
         return;
     }
-
-    crearMensajeHTML( mensaje, usuario );
-
+    crearMensajeHTML(mensaje, usuario);
 });
